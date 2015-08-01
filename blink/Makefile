@@ -9,11 +9,6 @@ F_CPU = 8000000UL
 BAUD  = 9600UL
 ## Also try BAUD = 19200 or 38400 if you're feeling lucky.
 
-## A directory for common include files and the simple USART library.
-## If you move either the current folder or the Library folder, you'll 
-##  need to change this path to match.
-LIBDIR = ../../AVR-Programming-Library
-
 ##########------------------------------------------------------##########
 ##########                 Programmer Defaults                  ##########
 ##########          Set up once, then forget about it           ##########
@@ -57,7 +52,7 @@ OBJECTS=$(SOURCES:.c=.o)
 HEADERS=$(SOURCES:.c=.h)
 
 ## Compilation options, type man avr-gcc if you're curious.
-CPPFLAGS = -DF_CPU=$(F_CPU) -DBAUD=$(BAUD) -I. -I$(LIBDIR)
+CPPFLAGS = -DF_CPU=$(F_CPU) -DBAUD=$(BAUD) -I.
 CFLAGS = -Os -g -std=gnu99 -Wall
 ## Use short (8-bit) data types 
 CFLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums 
@@ -137,26 +132,6 @@ flash_eeprom: $(TARGET).eeprom
 
 avrdude_terminal:
 	$(AVRDUDE) -c $(PROGRAMMER_TYPE) -p $(MCU) $(PROGRAMMER_ARGS) -nt
-
-## If you've got multiple programmers that you use, 
-## you can define them here so that it's easy to switch.
-## To invoke, use something like `make flash_arduinoISP`
-flash_usbtiny: PROGRAMMER_TYPE = usbtiny
-flash_usbtiny: PROGRAMMER_ARGS =  # USBTiny works with no further arguments
-flash_usbtiny: flash
-
-flash_usbasp: PROGRAMMER_TYPE = usbasp
-flash_usbasp: PROGRAMMER_ARGS =  # USBasp works with no further arguments
-flash_usbasp: flash
-
-flash_arduinoISP: PROGRAMMER_TYPE = avrisp
-flash_arduinoISP: PROGRAMMER_ARGS = -b 19200 -P /dev/ttyACM0 
-## (for windows) flash_arduinoISP: PROGRAMMER_ARGS = -b 19200 -P com5
-flash_arduinoISP: flash
-
-flash_109: PROGRAMMER_TYPE = avr109
-flash_109: PROGRAMMER_ARGS = -b 9600 -P /dev/ttyUSB0
-flash_109: flash
 
 ##########------------------------------------------------------##########
 ##########       Fuse settings and suitable defaults            ##########
