@@ -1,8 +1,6 @@
 // program to change brightness of an LED
 // demonstration of PWM
 
-#include <avr/io.h>
-#include <util/delay.h>
 #include <avr/interrupt.h>
 
 uint8_t brightness = 0;
@@ -42,7 +40,7 @@ int main()
   PORTB |= (1<<PB4); // pullup
   initPinChangeInterrupt4();
 
-  // run forever
-  while(1) {}
-  return 0;
+  while (1); // run forever
+
+  return 0; // should never get here
 }
