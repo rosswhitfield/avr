@@ -2,18 +2,18 @@
 // demonstration of PWM
 
 #include <avr/interrupt.h>
+#include <util/delay.h>
 
 uint8_t brightness = 0;
 
 // initialize PWM
-void pwm_init()
-{
+void pwm_init() {
   // initialize timer0 in PWM mode
-  TCCR0A |= (1<<WGM00)|(1<<COM0A1)|(1<<WGM01);
-  TCCR0B |= (1<<CS00);
+  TCCR0A |= (1 << WGM00) | (1 << COM0A1) | (1 << WGM01);
+  TCCR0B |= (1 << CS00);
 
   // make sure to make OC0 pin (pin PB3 for atmega32) as output pin
-  DDRB |= (1<<PB0);
+  DDRB |= (1 << PB0);
   OCR0A = 0;
 }
 
@@ -21,26 +21,27 @@ void pwm_init()
 ISR(PCINT0_vect) {
   brightness += 32;
   OCR0A = brightness;
+  _delay_ms(2);
 }
 
 // initalise interrupt
 void initPinChangeInterrupt4(void) {
-  GIMSK |= (1 << PCIE);        /* set pin-change interrupt for D pins */
-  PCMSK |= (1 << PCINT4);      /* set mask to look for PCINT18 / PD2 */
-  sei();                          /* set (global) interrupt enable bit */
+  GIMSK |= (1 << PCIE);   /* set pin-change interrupt for D pins */
+  PCMSK |= (1 << PCINT4); /* set mask to look for PCINT18 / PD2 */
+  sei();                  /* set (global) interrupt enable bit */
 }
 
-int main()
-{
+int main() {
   // initialize timer0 in PWM mode
   pwm_init();
 
   // initalise interrupt
-  DDRB |= (1<<PB4);  // set output
-  PORTB |= (1<<PB4); // pullup
+  DDRB |= (1 << PB4);  // set output
+  PORTB |= (1 << PB4); // pullup
   initPinChangeInterrupt4();
 
-  while (1); // run forever
+  while (1)
+    ; // run forever
 
   return 0; // should never get here
 }
