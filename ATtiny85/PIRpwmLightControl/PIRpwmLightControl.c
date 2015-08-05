@@ -2,6 +2,7 @@
 #include <util/delay.h>
 
 uint8_t brightness = 255;
+uint8_t time = 0;
 
 ISR(INT0_vect) {
   switch (brightness) {
@@ -27,12 +28,23 @@ ISR(PCINT0_vect) {
   }
 }
 
+ISR(TIM1_OVF_vect) {
+  for (int i = OCR0A; i > 0; --i) {
+    OCR0A = i;
+    _delay_ms(10);
+  }
+}
+
 int main() {
   // initialise timer0 in PWM mode using PB0
   TCCR0A |= (1 << WGM00) | (1 << WGM01) | (1 << COM0A1);
   TCCR0B |= (1 << CS00);
   DDRB |= (1 << PB0);
   OCR0A = 0;
+
+  // initialise timer1 for turnoff timer
+  TCCR1 |= (1 << CS13) | (1 << CS12) | (1 << CS11) | (1 << CS10);
+  TIMSK |= (1 << TOIE1);
 
   // initialise interrupt on PB4, PIR sensor
   GIMSK |= (1 << PCIE);
