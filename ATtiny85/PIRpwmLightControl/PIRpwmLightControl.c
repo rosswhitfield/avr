@@ -1,30 +1,28 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
-uint8_t brightness = 0;
-uint8_t maxBright = 255;
+uint8_t brightness = 255;
 
 ISR(INT0_vect) {
-  switch (maxBright) {
+  switch (brightness) {
   case 255:
-    maxBright = 0;
+    brightness = 0;
     break;
   case 0:
-    maxBright = 64;
+    brightness = 64;
     break;
   case 64:
-    maxBright = 128;
+    brightness = 128;
     break;
   default:
-    maxBright = 255;
+    brightness = 255;
   }
-  OCR0A = brightness = maxBright;
+  OCR0A = brightness;
 }
 
 ISR(PCINT0_vect) {
-  for (int i = brightness; i < maxBright; ++i) {
-    brightness = i;
-    OCR0A = brightness;
+  for (int i = OCR0A; i < brightness; ++i) {
+    OCR0A = i;
     _delay_ms(10);
   }
 }
