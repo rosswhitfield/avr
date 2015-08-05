@@ -2,7 +2,7 @@
 #include <util/delay.h>
 
 uint8_t brightness = 255;
-uint8_t time = 0;
+uint8_t time = 0; // 1 equals ~4.2sec
 
 ISR(INT0_vect) {
   switch (brightness) {
@@ -63,7 +63,7 @@ int main() {
   sei();
 
   while (1)
-    ; // run forever
+    ; // do nothing forever
 
   return 0; // should never get here
 }
