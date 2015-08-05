@@ -23,7 +23,7 @@ ISR(INT0_vect) {
 }
 
 ISR(PCINT0_vect) {
-  for (int i = OCR0A; i < brightness; ++i) {
+  for (int i = OCR0A; i <= brightness; i++) {
     OCR0A = i;
     _delay_ms(10);
   }
@@ -32,12 +32,11 @@ ISR(PCINT0_vect) {
 
 ISR(TIM1_OVF_vect) {
   time++;
-  if (time >= 30) {
-    for (int i = OCR0A; i > 0; --i) {
+  if (time >= 30)
+    for (int i = OCR0A; i >= 0; i--) {
       OCR0A = i;
       _delay_ms(10);
     }
-  }
 }
 
 int main() {
