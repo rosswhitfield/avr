@@ -32,7 +32,7 @@ ISR(PCINT0_vect) {
 
 ISR(TIM1_OVF_vect) {
   time++;
-  if (time == 30) {
+  if (time >= 30) {
     for (int i = OCR0A; i > 0; --i) {
       OCR0A = i;
       _delay_ms(10);
@@ -47,7 +47,7 @@ int main() {
   DDRB |= (1 << PB0);
   OCR0A = 0;
 
-  // initialise timer1 for turnoff timer
+  // initialise timer1 interrupt for turnoff timer
   TCCR1 |= (1 << CS13) | (1 << CS12) | (1 << CS11) | (1 << CS10);
   TIMSK |= (1 << TOIE1);
 
