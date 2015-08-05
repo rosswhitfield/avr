@@ -19,6 +19,7 @@ ISR(INT0_vect) {
     brightness = 255;
   }
   OCR0A = brightness;
+  time = 0;
 }
 
 ISR(PCINT0_vect) {
@@ -26,12 +27,16 @@ ISR(PCINT0_vect) {
     OCR0A = i;
     _delay_ms(10);
   }
+  time = 0;
 }
 
 ISR(TIM1_OVF_vect) {
-  for (int i = OCR0A; i > 0; --i) {
-    OCR0A = i;
-    _delay_ms(10);
+  time++;
+  if (time == 30) {
+    for (int i = OCR0A; i > 0; --i) {
+      OCR0A = i;
+      _delay_ms(10);
+    }
   }
 }
 
