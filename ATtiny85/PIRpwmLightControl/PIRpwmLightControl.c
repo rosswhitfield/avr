@@ -76,8 +76,9 @@ int main() {
   PCMSK |= (1 << PCINT4);
 
   // interrupt on INT0 (PB2), change max brightness
+  PORTB |= (1 << PB2); // internal pullup
   GIMSK |= (1 << INT0);
-  MCUCR |= (1 << ISC01); // Falling edge trigger
+  MCUCR |= (1 << ISC01); // falling edge trigger
 
   // set (global) interrupt enable bit
   sei();
