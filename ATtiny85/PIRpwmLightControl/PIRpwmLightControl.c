@@ -33,7 +33,7 @@ ISR(PCINT0_vect) {
 ISR(TIM1_OVF_vect) {
   time++;
   if (time >= 30)
-    for (int i = OCR0A; i >= 0; i--) {
+    for (int i = OCR0A - 1; i >= 0; i--) {
       OCR0A = i;
       _delay_ms(10);
     }
