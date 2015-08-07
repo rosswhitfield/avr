@@ -7,17 +7,17 @@
            | ATtiny85 |          BTN
    PIR ----|3        6|
            |          |
-   GND ----|4        5|---------+
-           |          |         |
-           +----------+       __|__
-                              /   \ MOSFET
-                             +     +
-                             |     |
-                           _____  GND
-                       LED  / \
-                           -----
-                             |
-                            +5V
+   GND ----|4        5|---/\/\/---+
+           |          |           |
+           +----------+         __|__ MOSFET
+                                /   \
+                               +     +
+                               |     |
+                             _____  GND
+                         LED  / \
+                             -----
+                               |
+                              +5V
 */
 #include <avr/interrupt.h>
 #include <util/delay.h>
