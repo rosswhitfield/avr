@@ -22,8 +22,8 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
-uint8_t brightness = 255;
-uint8_t time = 0; // 1 equals ~4.2sec at 1MHz
+volatile uint8_t brightness = 255;
+volatile uint8_t time = 0; // 1 equals ~4.2sec at 1MHz
 
 ISR(INT0_vect) {
   switch (brightness) {
