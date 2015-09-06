@@ -22,7 +22,7 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
-volatile uint8_t brightness = 255;
+volatile uint8_t brightness = 128;
 volatile uint8_t time = 0; // 1 equals ~4.2sec at 1MHz
 
 ISR(INT0_vect) {
