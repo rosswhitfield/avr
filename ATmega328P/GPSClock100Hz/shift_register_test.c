@@ -96,18 +96,6 @@ void HC595Write(uint8_t data) {
   HC595Latch();
 }
 
-/*
-
-Simple Delay function approx 0.5 seconds
-
-*/
-
-void Wait() {
-  for (uint8_t i = 0; i < 30; i++) {
-    _delay_loop_2(0);
-  }
-}
-
 int main() {
   uint8_t led_pattern[8] = {
       0b10000001, 0b11000011, 0b11100111, 0b11111111,
@@ -121,7 +109,7 @@ int main() {
   while (1) {
     for (uint8_t i = 0; i < 8; i++) {
       HC595Write(led_pattern[i]); // Write the data to HC595
-      Wait();                     // Wait
+      _delay_loop_2(0);           // Wait
     }
   }
 }
