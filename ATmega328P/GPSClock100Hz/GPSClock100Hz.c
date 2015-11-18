@@ -11,7 +11,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-uint8_t digit[] = {0x7E, 0x30, 0x6D, 0x79, 0x33, 0x5B, 0x5F, 0x70, 0x7F, 0x7B};
+uint8_t digit[] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F};
 
 void writeDigit(uint8_t);
 
@@ -32,7 +32,7 @@ int main() {
 }
 
 void writeDigit(uint8_t value) {
-  for (uint8_t i = 0; i < 7; i++) {
+  for (uint8_t i = 0; i < 8; i++) {
     if (1 << i & value)
       PORTB |= (1 << PB0);
     else
