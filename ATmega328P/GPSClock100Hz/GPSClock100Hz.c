@@ -11,24 +11,22 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-uint8_t digit[] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F};
+const uint8_t digit[] = {0x3F, 0x06, 0x5B, 0x4F, 0x66,
+                         0x6D, 0x7D, 0x07, 0x7F, 0x6F};
 
 void writeDigit(uint8_t);
+void toggleLatchPB2();
 
 int main() {
-  // PB0 - Data
-  // PB1 - Clock
-  // PB2 - Latch
+  // PB0 - Data // PB1 - Clock // PB2 - Latch
   DDRB |= (1 << PB0) | (1 << PB1) | (1 << PB2);
-  while (1) {
+
+  while (1)
     for (uint8_t i = 0; i < 10; i++) {
       writeDigit(digit[i]);
-      PORTB |= (1 << PB2);
-      _delay_loop_1(1);
-      PORTB &= ~(1 << PB2);
-      _delay_ms(500);
+      toggleLatchPB2();
+      _delay_ms(100);
     }
-  }
 }
 
 void writeDigit(uint8_t value) {
@@ -40,4 +38,11 @@ void writeDigit(uint8_t value) {
     PORTB |= (1 << PB1);
     PORTB &= ~(1 << PB1);
   }
+}
+
+void toggleLatchPB2() {
+  PORTB |= (1 << PB2);
+  _delay_loop_1(1);
+  PORTB &= ~(1 << PB2);
+  _delay_loop_1(1);
 }
