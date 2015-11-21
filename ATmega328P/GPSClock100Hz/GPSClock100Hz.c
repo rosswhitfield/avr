@@ -15,18 +15,31 @@ const uint8_t digit[] = {0x3F, 0x06, 0x5B, 0x4F, 0x66,
                          0x6D, 0x7D, 0x07, 0x7F, 0x6F};
 
 void writeDigit(uint8_t);
+void selectDigit(uint8_t);
+void deselectDigit();
 void toggleLatchPB2();
+void toggleLatchPD4();
 
 int main() {
+  // Seven segment
   // PB0 - Data // PB1 - Clock // PB2 - Latch
   DDRB |= (1 << PB0) | (1 << PB1) | (1 << PB2);
 
-  while (1)
-    for (uint8_t i = 0; i < 10; i++) {
-      writeDigit(digit[i]);
+  // Digit select
+  // PD2 - Data // PD3 - Clock // PD4 - Latch
+  DDRD |= (1 << PD2) | (1 << PD3) | (1 << PD4);
+
+  for (uint16_t i = 0; i < 9999; i++) {
+    uint16_t number = i;
+    for (uint8_t n=0 ; n<4; n++){
+      writeDigit(digit[number%10]);
+      deselectDigit();
       toggleLatchPB2();
-      _delay_ms(100);
+      selectDigit(n+4);
+      _delay_ms(10);
+      number/=10;
     }
+  }
 }
 
 void writeDigit(uint8_t value) {
@@ -44,5 +57,37 @@ void toggleLatchPB2() {
   PORTB |= (1 << PB2);
   _delay_loop_1(1);
   PORTB &= ~(1 << PB2);
+  _delay_loop_1(1);
+}
+
+void selectDigit(uint8_t number) {
+  for (uint8_t i = 0; i < 8; i++) {
+    if (i == number)
+      PORTD &= ~(1 << PB2);
+    else
+      PORTD |= (1 << PB2);
+    PORTD |= (1 << PB3);
+    _delay_loop_1(1);
+    PORTD &= ~(1 << PB3);
+    _delay_loop_1(1);
+  }
+  toggleLatchPD4();
+}
+
+void deselectDigit() {
+  PORTD |= (1 << PB2);
+  for (uint8_t i = 0; i < 8; i++) {
+    PORTD |= (1 << PB3);
+    _delay_loop_1(1);
+    PORTD &= ~(1 << PB3);
+    _delay_loop_1(1);
+  }
+  toggleLatchPD4();
+}
+
+void toggleLatchPD4() {
+  PORTD |= (1 << PD4);
+  _delay_loop_1(1);
+  PORTD &= ~(1 << PD4);
   _delay_loop_1(1);
 }
