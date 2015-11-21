@@ -29,15 +29,15 @@ int main() {
   // PD2 - Data // PD3 - Clock // PD4 - Latch
   DDRD |= (1 << PD2) | (1 << PD3) | (1 << PD4);
 
-  for (uint16_t i = 0; i < 9999; i++) {
-    uint16_t number = i;
-    for (uint8_t n=0 ; n<4; n++){
-      writeDigit(digit[number%10]);
+  while (1) {
+    uint16_t number = 1234;
+    for (uint8_t n = 0; n < 4; n++) {
+      writeDigit(digit[number % 10]);
       deselectDigit();
       toggleLatchPB2();
-      selectDigit(n+4);
-      _delay_ms(10);
-      number/=10;
+      selectDigit(n + 4);
+      _delay_loop_1(100);
+      number /= 10;
     }
   }
 }
