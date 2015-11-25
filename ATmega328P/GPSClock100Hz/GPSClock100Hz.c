@@ -8,17 +8,21 @@
  *       d
  */
 
-#include <avr/io.h>
+#include <avr/interrupt.h>
 #include <util/delay.h>
 
 const uint8_t digit[] = {0x3F, 0x06, 0x5B, 0x4F, 0x66,
                          0x6D, 0x7D, 0x07, 0x7F, 0x6F};
+
+volatile uint16_t cs = 0;
 
 void writeDigit(uint8_t);
 void selectDigit(uint8_t);
 void deselectDigit();
 void toggleLatchPB2();
 void toggleLatchPD4();
+
+ISR(TIMER1_COMPA_vect) { cs++; }
 
 int main() {
   // Seven segment
@@ -29,8 +33,14 @@ int main() {
   // PD2 - Data // PD3 - Clock // PD4 - Latch
   DDRD |= (1 << PD2) | (1 << PD3) | (1 << PD4);
 
+  // Start timer
+  OCR1A = 10000;
+  TCCR1B |= (1 << WGM12) | (1 << CS10);
+  TIMSK1 |= (1 << OCIE1A);
+  sei();
+
   while (1) {
-    uint16_t number = 1234;
+    uint16_t number = cs;
     for (uint8_t n = 0; n < 4; n++) {
       writeDigit(digit[number % 10]);
       deselectDigit();
