@@ -15,6 +15,7 @@ const uint8_t digit[] = {0x3F, 0x06, 0x5B, 0x4F, 0x66,
                          0x6D, 0x7D, 0x07, 0x7F, 0x6F};
 
 volatile uint16_t centiSeconds = 0;
+volatile uint16_t minutes = 0;
 
 void writeDigit(uint8_t);
 void selectDigit(uint8_t);
@@ -22,7 +23,15 @@ void deselectDigit();
 void toggleLatchPB2();
 void toggleLatchPD4();
 
-ISR(TIMER1_COMPA_vect) { centiSeconds++; }
+ISR(TIMER1_COMPA_vect) {
+  centiSeconds++;
+  if (centiSeconds == 6000) {
+    centiSeconds = 0;
+    minutes++;
+    if (minutes == 1440)
+      minutes = 0;
+  }
+}
 
 int main() {
   // Seven segment
