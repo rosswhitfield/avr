@@ -14,7 +14,7 @@
 const uint8_t digit[] = {0x3F, 0x06, 0x5B, 0x4F, 0x66,
                          0x6D, 0x7D, 0x07, 0x7F, 0x6F};
 
-volatile uint16_t cs = 0;
+volatile uint16_t centiSeconds = 0;
 
 void writeDigit(uint8_t);
 void selectDigit(uint8_t);
@@ -22,7 +22,7 @@ void deselectDigit();
 void toggleLatchPB2();
 void toggleLatchPD4();
 
-ISR(TIMER1_COMPA_vect) { cs++; }
+ISR(TIMER1_COMPA_vect) { centiSeconds++; }
 
 int main() {
   // Seven segment
@@ -40,7 +40,7 @@ int main() {
   sei();
 
   while (1) {
-    uint16_t number = cs;
+    uint16_t number = centiSeconds;
     for (uint8_t n = 0; n < 4; n++) {
       writeDigit(digit[number % 10]);
       deselectDigit();
