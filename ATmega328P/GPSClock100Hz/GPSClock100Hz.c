@@ -70,10 +70,10 @@ ISR(TIMER1_COMPA_vect) {
 }
 
 void writeDigit(uint8_t value, uint8_t location) {
-  writeSegments(digit[value]);
-  selectDigit(-1);       // Deselect digit
-  toggleLatchPB2();      // Display digit
-  selectDigit(location); // Select digit n
+  writeSegments(digit[value]); // Select segments
+  selectDigit(-1);             // Deselect digit
+  toggleLatchPB2();            // Display segments
+  selectDigit(location);       // Select digit n
   _delay_loop_1(100);
 }
 
