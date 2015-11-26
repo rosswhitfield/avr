@@ -11,6 +11,7 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
+// en.wikipedia.org/wiki/Seven-segment_display#Displaying_letters
 const uint8_t digit[] = {0x3F, 0x06, 0x5B, 0x4F, 0x66,
                          0x6D, 0x7D, 0x07, 0x7F, 0x6F};
 
@@ -33,26 +34,26 @@ ISR(TIMER1_COMPA_vect) {
 
 int main() {
   // Seven segment
-  // PB0 - Data // PB1 - Clock // PB2 - Latch
+  // PB0 - Data, PB1 - Clock, PB2 - Latch
   DDRB |= (1 << PB0) | (1 << PB1) | (1 << PB2);
 
   // Digit select
-  // PD2 - Data // PD3 - Clock // PD4 - Latch
+  // PD2 - Data, PD3 - Clock, PD4 - Latch
   DDRD |= (1 << PD2) | (1 << PD3) | (1 << PD4);
 
-  // Start timer
-  OCR1A = 10000;
-  TCCR1B |= (1 << WGM12) | (1 << CS10);
-  TIMSK1 |= (1 << OCIE1A);
-  sei();
+  // Start CTC timer with interrupt on OCF1A match
+  OCR1A = 10000;                        // 0.01 seconds
+  TCCR1B |= (1 << WGM12) | (1 << CS10); // CTC
+  TIMSK1 |= (1 << OCIE1A);              // Interrupt match OCF1A
+  sei();                                // Enable global interrupt
 
   while (1) {
     uint16_t number = centiSeconds;
     for (uint8_t n = 0; n < 4; n++) {
       writeDigit(digit[number % 10]);
-      selectDigit(-1);
-      toggleLatchPB2();
-      selectDigit(n);
+      selectDigit(-1);  // Deselect digit
+      toggleLatchPB2(); // Display digit
+      selectDigit(n);   // Select digit n
       _delay_loop_1(100);
       number /= 10;
     }
@@ -88,6 +89,7 @@ void selectDigit(uint8_t number) {
     PORTD &= ~(1 << PB3);
     _delay_loop_1(1);
   }
+  // Toggle latch
   PORTD |= (1 << PD4);
   _delay_loop_1(1);
   PORTD &= ~(1 << PD4);
