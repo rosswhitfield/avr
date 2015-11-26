@@ -22,16 +22,6 @@ void writeDigit(uint8_t);
 void selectDigit(uint8_t);
 void toggleLatchPB2();
 
-ISR(TIMER1_COMPA_vect) {
-  centiSeconds++;
-  if (centiSeconds == 6000) {
-    centiSeconds = 0;
-    minutes++;
-    if (minutes == 1440)
-      minutes = 0;
-  }
-}
-
 int main() {
   // Seven segment
   // PB0 - Data, PB1 - Clock, PB2 - Latch
@@ -41,7 +31,7 @@ int main() {
   // PD2 - Data, PD3 - Clock, PD4 - Latch
   DDRD |= (1 << PD2) | (1 << PD3) | (1 << PD4);
 
-  // Start CTC timer with interrupt on OCF1A match
+  // Start CTC timer1 with interrupt on OCF1A match
   OCR1A = 10000;                        // 0.01 seconds
   TCCR1B |= (1 << WGM12) | (1 << CS10); // CTC
   TIMSK1 |= (1 << OCIE1A);              // Interrupt match OCF1A
@@ -57,6 +47,16 @@ int main() {
       _delay_loop_1(100);
       number /= 10;
     }
+  }
+}
+
+ISR(TIMER1_COMPA_vect) {
+  centiSeconds++;
+  if (centiSeconds == 6000) {
+    centiSeconds = 0;
+    minutes++;
+    if (minutes == 1440)
+      minutes = 0;
   }
 }
 
