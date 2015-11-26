@@ -16,7 +16,7 @@ const uint8_t digit[] = {0x3F, 0x06, 0x5B, 0x4F, 0x66,
                          0x6D, 0x7D, 0x07, 0x7F, 0x6F};
 
 volatile uint16_t centiSeconds = 0;
-volatile uint16_t minutes = 754;
+volatile uint16_t minutes = 0;
 
 void writeDigit(uint8_t, uint8_t);
 void writeSegments(uint8_t);
@@ -33,7 +33,7 @@ int main() {
   DDRD |= (1 << PD2) | (1 << PD3) | (1 << PD4);
 
   // Start CTC timer1 with interrupt on OCF1A match
-  OCR1A = 10000;                        // 0.01 seconds
+  OCR1A = 20000;                        // 0.01 seconds
   TCCR1B |= (1 << WGM12) | (1 << CS10); // CTC
   TIMSK1 |= (1 << OCIE1A);              // Interrupt match OCF1A
   sei();                                // Enable global interrupt
