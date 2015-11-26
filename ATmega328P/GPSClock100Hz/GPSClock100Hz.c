@@ -18,6 +18,7 @@ const uint8_t digit[] = {0x3F, 0x06, 0x5B, 0x4F, 0x66,
 volatile uint16_t centiSeconds = 0;
 volatile uint16_t minutes = 754;
 
+void writeDigit(uint8_t, uint8_t);
 void writeSegments(uint8_t);
 void selectDigit(uint8_t);
 void toggleLatchPB2();
@@ -42,33 +43,19 @@ int main() {
     // Write seconds and centiSeconds
     tmp = centiSeconds;
     for (uint8_t n = 0; n < 4; n++) {
-      writeSegments(digit[tmp % 10]);
-      selectDigit(-1);  // Deselect digit
-      toggleLatchPB2(); // Display digit
-      selectDigit(n);   // Select digit n
-      _delay_loop_1(100);
+      writeDigit(tmp % 10, n);
       tmp /= 10;
     }
     // Write minutes
     tmp = minutes % 60;
-    for (uint8_t n = 4; n < 6; n++) {
-      writeSegments(digit[tmp % 10]);
-      selectDigit(-1);  // Deselect digit
-      toggleLatchPB2(); // Display digit
-      selectDigit(n);   // Select digit n
-      _delay_loop_1(100);
-      tmp /= 10;
-    }
+    writeDigit(tmp % 10, 4);
+    tmp /= 10;
+    writeDigit(tmp % 10, 5);
     // Write hours
     tmp = minutes / 60;
-    for (uint8_t n = 6; n < 8; n++) {
-      writeSegments(digit[tmp % 10]);
-      selectDigit(-1);  // Deselect digit
-      toggleLatchPB2(); // Display digit
-      selectDigit(n);   // Select digit n
-      _delay_loop_1(100);
-      tmp /= 10;
-    }
+    writeDigit(tmp % 10, 6);
+    tmp /= 10;
+    writeDigit(tmp % 10, 7);
   }
 }
 
@@ -80,6 +67,14 @@ ISR(TIMER1_COMPA_vect) {
     if (minutes == 1440)
       minutes = 0;
   }
+}
+
+void writeDigit(uint8_t value, uint8_t location) {
+  writeSegments(digit[value]);
+  selectDigit(-1);       // Deselect digit
+  toggleLatchPB2();      // Display digit
+  selectDigit(location); // Select digit n
+  _delay_loop_1(100);
 }
 
 void writeSegments(uint8_t value) {
