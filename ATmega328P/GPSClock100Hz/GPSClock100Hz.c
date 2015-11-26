@@ -20,7 +20,6 @@ volatile uint16_t minutes = 0;
 void writeDigit(uint8_t);
 void selectDigit(uint8_t);
 void toggleLatchPB2();
-void toggleLatchPD4();
 
 ISR(TIMER1_COMPA_vect) {
   centiSeconds++;
@@ -89,10 +88,6 @@ void selectDigit(uint8_t number) {
     PORTD &= ~(1 << PB3);
     _delay_loop_1(1);
   }
-  toggleLatchPD4();
-}
-
-void toggleLatchPD4() {
   PORTD |= (1 << PD4);
   _delay_loop_1(1);
   PORTD &= ~(1 << PD4);
