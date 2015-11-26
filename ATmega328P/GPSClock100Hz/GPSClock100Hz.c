@@ -16,7 +16,7 @@ const uint8_t digit[] = {0x3F, 0x06, 0x5B, 0x4F, 0x66,
                          0x6D, 0x7D, 0x07, 0x7F, 0x6F};
 
 volatile uint16_t centiSeconds = 0;
-volatile uint16_t minutes = 0;
+volatile uint16_t minutes = 754;
 
 void writeDigit(uint8_t);
 void selectDigit(uint8_t);
@@ -37,15 +37,37 @@ int main() {
   TIMSK1 |= (1 << OCIE1A);              // Interrupt match OCF1A
   sei();                                // Enable global interrupt
 
+  uint16_t tmp;
   while (1) {
-    uint16_t number = centiSeconds;
+    // Write seconds and centiSeconds
+    tmp = centiSeconds;
     for (uint8_t n = 0; n < 4; n++) {
-      writeDigit(digit[number % 10]);
+      writeDigit(digit[tmp % 10]);
       selectDigit(-1);  // Deselect digit
       toggleLatchPB2(); // Display digit
       selectDigit(n);   // Select digit n
       _delay_loop_1(100);
-      number /= 10;
+      tmp /= 10;
+    }
+    // Write minutes
+    tmp = minutes % 60;
+    for (uint8_t n = 4; n < 6; n++) {
+      writeDigit(digit[tmp % 10]);
+      selectDigit(-1);  // Deselect digit
+      toggleLatchPB2(); // Display digit
+      selectDigit(n);   // Select digit n
+      _delay_loop_1(100);
+      tmp /= 10;
+    }
+    // Write hours
+    tmp = minutes / 60;
+    for (uint8_t n = 6; n < 8; n++) {
+      writeDigit(digit[tmp % 10]);
+      selectDigit(-1);  // Deselect digit
+      toggleLatchPB2(); // Display digit
+      selectDigit(n);   // Select digit n
+      _delay_loop_1(100);
+      tmp /= 10;
     }
   }
 }
