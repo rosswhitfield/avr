@@ -19,7 +19,6 @@ volatile uint16_t minutes = 0;
 
 void writeDigit(uint8_t);
 void selectDigit(uint8_t);
-void deselectDigit();
 void toggleLatchPB2();
 void toggleLatchPD4();
 
@@ -52,7 +51,7 @@ int main() {
     uint16_t number = centiSeconds;
     for (uint8_t n = 0; n < 4; n++) {
       writeDigit(digit[number % 10]);
-      deselectDigit();
+      selectDigit(-1);
       toggleLatchPB2();
       selectDigit(n + 4);
       _delay_loop_1(100);
@@ -85,17 +84,6 @@ void selectDigit(uint8_t number) {
       PORTD &= ~(1 << PB2);
     else
       PORTD |= (1 << PB2);
-    PORTD |= (1 << PB3);
-    _delay_loop_1(1);
-    PORTD &= ~(1 << PB3);
-    _delay_loop_1(1);
-  }
-  toggleLatchPD4();
-}
-
-void deselectDigit() {
-  PORTD |= (1 << PB2);
-  for (uint8_t i = 0; i < 8; i++) {
     PORTD |= (1 << PB3);
     _delay_loop_1(1);
     PORTD &= ~(1 << PB3);
