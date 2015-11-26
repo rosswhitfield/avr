@@ -53,7 +53,7 @@ int main() {
       writeDigit(digit[number % 10]);
       selectDigit(-1);
       toggleLatchPB2();
-      selectDigit(n + 4);
+      selectDigit(n);
       _delay_loop_1(100);
       number /= 10;
     }
