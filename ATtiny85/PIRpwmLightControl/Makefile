@@ -140,7 +140,7 @@ avrdude_terminal:
 # AtTiny85 default
 # (E:FF, H:DF, L:62)
 LFUSE = 0x62
-HFUSE = 0xdf
+HFUSE = 0xdc
 EFUSE = 0xff
 
 
