@@ -17,6 +17,7 @@ const uint8_t digit[] = {0x3F, 0x06, 0x5B, 0x4F, 0x66,
 
 volatile uint16_t centiSeconds = 0;
 volatile uint16_t minutes = 0;
+volatile uint8_t digit_select = 0;
 
 void writeDigit(uint8_t, uint8_t);
 void writeSegments(uint8_t);
@@ -36,27 +37,46 @@ int main() {
   OCR1A = 19999;                        // 0.01 seconds
   TCCR1B |= (1 << WGM12) | (1 << CS10); // CTC
   TIMSK1 |= (1 << OCIE1A);              // Interrupt match OCF1A
-  sei();                                // Enable global interrupt
 
-  uint16_t tmp;
-  while (1) {
-    // Write seconds and centiSeconds
-    tmp = centiSeconds;
-    for (uint8_t n = 0; n < 4; n++) {
-      writeDigit(tmp % 10, n);
-      tmp /= 10;
-    }
-    // Write minutes
-    tmp = minutes % 60;
-    writeDigit(tmp % 10, 4);
-    tmp /= 10;
-    writeDigit(tmp % 10, 5);
-    // Write hours
-    tmp = minutes / 60;
-    writeDigit(tmp % 10, 6);
-    tmp /= 10;
-    writeDigit(tmp % 10, 7);
+  // Start timer0 with overflow interrupt
+  TCCR0B |= (1 << CS01);  // clk/8 precaler
+  TIMSK0 |= (1 << TIFR0); // Enable Overflow Interrupt
+
+  // Enable global interrupt
+  sei();
+
+  while (1)
+    ; // do nothing forever
+}
+
+ISR(TIMER0_OVF_vect) {
+  switch (digit_select) {
+  case 0:
+    writeDigit(centiSeconds % 10, 0);
+    break;
+  case 1:
+    writeDigit(centiSeconds / 10 % 10, 1);
+    break;
+  case 2:
+    writeDigit(centiSeconds / 100 % 10, 2);
+    break;
+  case 3:
+    writeDigit(centiSeconds / 1000, 3);
+    break;
+  case 4:
+    writeDigit(minutes % 10, 4);
+    break;
+  case 5:
+    writeDigit(minutes % 60 / 10, 5);
+    break;
+  case 6:
+    writeDigit(minutes / 60 % 10, 6);
+    break;
+  case 7:
+    writeDigit(minutes / 600, 7);
+    break;
   }
+  digit_select = (digit_select + 1) & 7;
 }
 
 ISR(TIMER1_COMPA_vect) {
