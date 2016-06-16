@@ -32,11 +32,11 @@ int main() {
   // PD2 - Data, PD3 - Clock, PD4 - Latch
   DDRD |= (1 << PD2) | (1 << PD3) | (1 << PD4);
 
-  // Start CTC timer1 with interrupt on OCF1A match
-  OCR1A = 10000;                        // 0.01 seconds
-  TCCR1B |= (1 << WGM12) | (1 << CS10); // CTC
-  TIMSK1 |= (1 << OCIE1A);              // Interrupt match OCF1A
-  sei();                                // Enable global interrupt
+  // Start timer2
+  ASSR |= (1 << AS2);                  // Use external timer crystal
+  TCCR2B |= (1 << CS22) | (1 << CS20); // 128 prescaler
+  TIMSK2 |= (1 << TOIE2);              // Overflow interrupt
+  sei();                               // Enable global interrupt
 
   uint16_t tmp;
   while (1) {
@@ -59,8 +59,8 @@ int main() {
   }
 }
 
-ISR(TIMER1_COMPA_vect) {
-  centiSeconds++;
+ISR(TIMER2_OVF_vect) {
+  centiSeconds+=100;
   if (centiSeconds == 6000) {
     centiSeconds = 0;
     minutes++;
