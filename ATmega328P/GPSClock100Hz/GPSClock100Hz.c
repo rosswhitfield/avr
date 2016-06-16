@@ -33,7 +33,7 @@ int main() {
   DDRD |= (1 << PD2) | (1 << PD3) | (1 << PD4);
 
   // Start CTC timer1 with interrupt on OCF1A match
-  OCR1A = 10000;                        // 0.01 seconds
+  OCR1A = 19999;                        // 0.01 seconds
   TCCR1B |= (1 << WGM12) | (1 << CS10); // CTC
   TIMSK1 |= (1 << OCIE1A);              // Interrupt match OCF1A
   sei();                                // Enable global interrupt
