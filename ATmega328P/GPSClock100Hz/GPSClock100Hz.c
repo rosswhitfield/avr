@@ -11,6 +11,10 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
+#define FOSC 16000000 // Clock Speed
+#define BAUDRATE 9600
+#define MYUBRR FOSC / 16 / BAUDRATE - 1
+
 // en.wikipedia.org/wiki/Seven-segment_display#Displaying_letters
 const uint8_t digit[] = {0x3F, 0x06, 0x5B, 0x4F, 0x66,
                          0x6D, 0x7D, 0x07, 0x7F, 0x6F};
@@ -19,12 +23,17 @@ volatile uint16_t centiSeconds = 0;
 volatile uint16_t minutes = 0;
 volatile uint8_t digit_select = 0;
 
+void USART_Init(unsigned int ubrr);
+void USART_Transmit(unsigned char data);
 void writeDigit(uint8_t, uint8_t);
 void writeSegments(uint8_t);
 void selectDigit(uint8_t);
 void toggleLatchPB2();
 
 int main() {
+  // USART Initialization
+  USART_Init(MYUBRR);
+
   // Seven segment
   // PB0 - Data, PB1 - Clock, PB2 - Latch
   DDRB |= (1 << PB0) | (1 << PB1) | (1 << PB2);
@@ -39,14 +48,43 @@ int main() {
   TIMSK1 |= (1 << OCIE1A);              // Interrupt match OCF1A
 
   // Start timer0 with overflow interrupt
-  TCCR0B |= (1 << CS01);  // clk/8 precaler
+  TCCR0B |= (1 << CS01);  // clk/8 prescaler
   TIMSK0 |= (1 << TIFR0); // Enable Overflow Interrupt
 
   // Enable global interrupt
   sei();
 
-  while (1)
-    ; // do nothing forever
+  while (1) {
+    USART_Transmit(minutes / 600 + 48);
+    USART_Transmit(minutes / 60 % 10 + 48);
+    USART_Transmit(':');
+    USART_Transmit(minutes % 60 / 10 + 48);
+    USART_Transmit(minutes % 10 + 48);
+    USART_Transmit(':');
+    USART_Transmit(centiSeconds / 1000 + 48);
+    USART_Transmit(centiSeconds / 100 % 10 + 48);
+    USART_Transmit('\n');
+    USART_Transmit('\r');
+    _delay_ms(1000);
+  }
+}
+
+void USART_Init(unsigned int ubrr) {
+  // Set baud rate
+  UBRR0H = (unsigned char)(ubrr >> 8);
+  UBRR0L = (unsigned char)ubrr;
+  // Enable transmitter
+  UCSR0B = (1 << TXEN0);
+  // Set frame format: 8bit data
+  UCSR0C = (1 << UMSEL00) | (1 << UCSZ00) | (1 << UCSZ01);
+}
+
+void USART_Transmit(unsigned char data) {
+  // Wait for empty transmit buffer
+  while (!(UCSR0A & (1 << UDRE0)))
+    ;
+  // Put data into buffer, sends the data
+  UDR0 = data;
 }
 
 ISR(TIMER0_OVF_vect) {
